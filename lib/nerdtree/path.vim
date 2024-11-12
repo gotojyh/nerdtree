@@ -62,7 +62,7 @@ function! s:Path.cacheDisplayString() abort
     endif
 
     if self.isSymLink
-        let self.cachedDisplayString = self.addDelimiter(self.cachedDisplayString) . ' -> ' . self.symLinkDest
+        let self.cachedDisplayString = self.addDelimiter(self.cachedDisplayString) " . ' -> ' . self.symLinkDest
     endif
 
     if !self.isDirectory && b:NERDTree.ui.getShowFileLines() != 0
@@ -470,32 +470,33 @@ endfunction
 " FUNCTION: Path.ignore(nerdtree) {{{1
 " returns true if this path should be ignored
 function! s:Path.ignore(nerdtree)
+	l:ret=exists('g:NERDTreeIgnoreBool')?g:NERDTreeIgnoreBool:1
     "filter out the user specified paths to ignore
     if a:nerdtree.ui.isIgnoreFilterEnabled()
         for i in g:NERDTreeIgnore
             if self._ignorePatternMatches(i)
-                return 1
+                return l:ret
             endif
         endfor
 
         for l:Callback in g:NERDTree.PathFilters()
             let l:Callback = type(l:Callback) ==# type(function('tr')) ? l:Callback : function(l:Callback)
             if l:Callback({'path': self, 'nerdtree': a:nerdtree})
-               return 1
+               return l:ret
             endif
         endfor
     endif
 
     "dont show hidden files unless instructed to
     if !a:nerdtree.ui.getShowHidden() && self.isUnixHiddenFile()
-        return 1
+        return l:ret
     endif
 
     if a:nerdtree.ui.getShowFiles() ==# 0 && self.isDirectory ==# 0
-        return 1
+        return l:ret
     endif
 
-    return 0
+    return !l:ret
 endfunction
 
 " FUNCTION: Path._ignorePatternMatches(pattern) {{{1
