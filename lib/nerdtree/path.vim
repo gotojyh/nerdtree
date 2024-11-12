@@ -470,7 +470,11 @@ endfunction
 " FUNCTION: Path.ignore(nerdtree) {{{1
 " returns true if this path should be ignored
 function! s:Path.ignore(nerdtree)
-	l:ret=exists('g:NERDTreeIgnoreBool')?g:NERDTreeIgnoreBool:1
+	if exists('g:NERDTreeIgnoreBool')
+		let l:ret=g:NERDTreeIgnoreBool
+	else
+		let l:ret=1
+	endif
     "filter out the user specified paths to ignore
     if a:nerdtree.ui.isIgnoreFilterEnabled()
         for i in g:NERDTreeIgnore
