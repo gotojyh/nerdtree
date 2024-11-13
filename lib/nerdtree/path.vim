@@ -467,40 +467,48 @@ function! s:Path.isUnixHiddenPath()
     endif
 endfunction
 
+
 " FUNCTION: Path.ignore(nerdtree) {{{1
 " returns true if this path should be ignored
 function! s:Path.ignore(nerdtree)
-	if exists('g:NERDTreeIgnoreBool')
-		let l:ret=g:NERDTreeIgnoreBool
-	else
-		let l:ret=1
-	endif
+
     "filter out the user specified paths to ignore
     if a:nerdtree.ui.isIgnoreFilterEnabled()
         for i in g:NERDTreeIgnore
             if self._ignorePatternMatches(i)
-                return l:ret
+                return 1
             endif
         endfor
 
         for l:Callback in g:NERDTree.PathFilters()
             let l:Callback = type(l:Callback) ==# type(function('tr')) ? l:Callback : function(l:Callback)
             if l:Callback({'path': self, 'nerdtree': a:nerdtree})
-               return l:ret
+               return 1
             endif
         endfor
     endif
 
     "dont show hidden files unless instructed to
     if !a:nerdtree.ui.getShowHidden() && self.isUnixHiddenFile()
-        return l:ret
+        return 1 
     endif
 
     if a:nerdtree.ui.getShowFiles() ==# 0 && self.isDirectory ==# 0
-        return l:ret
+        return 1 
     endif
 
-    return !l:ret
+	if len(g:NERDTreeShowFilter)>0
+		for i in g:NERDTreeShowFilter
+			if self._showPatternMatches(i)
+				call writefile([self.str(),i],'/tmp/vi.log','a')
+				return 0
+			endif
+		endfor
+		return 1
+	endif
+
+    return 0
+
 endfunction
 
 " FUNCTION: Path._ignorePatternMatches(pattern) {{{1
@@ -523,6 +531,23 @@ function! s:Path._ignorePatternMatches(pattern)
     endif
 
     return self.getLastPathComponent(0) =~# pat
+endfunction
+
+function! s:Path._showPatternMatches(pattern)
+	let pat=a:pattern
+	let path=self.str()
+
+
+	if strlen(path)>=strlen(pat) && path =~ '^'. pat
+		return 1
+	endif
+
+	if strlen(pat)>strlen(path) && pat =~ '^'. path
+		return 1
+	endif
+
+	return 0
+
 endfunction
 
 " FUNCTION: Path.isAncestor(path) {{{1

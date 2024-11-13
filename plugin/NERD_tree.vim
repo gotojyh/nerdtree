@@ -39,6 +39,7 @@ let g:NERDTreeCreatePrefix          = get(g:, 'NERDTreeCreatePrefix',          '
 let g:NERDTreeMinimalUI             = get(g:, 'NERDTreeMinimalUI',             0)
 let g:NERDTreeMinimalMenu           = get(g:, 'NERDTreeMinimalMenu',           0)
 let g:NERDTreeIgnore                = get(g:, 'NERDTreeIgnore',                ['\~$'])
+let g:NERDTreeShowFilter            = get(g:, 'NERDTreeShowFilter',            [])
 let g:NERDTreeBookmarksFile         = get(g:, 'NERDTreeBookmarksFile',         expand('$HOME') . '/.NERDTreeBookmarks')
 let g:NERDTreeBookmarksSort         = get(g:, 'NERDTreeBookmarksSort',         1)
 let g:NERDTreeHighlightCursorline   = get(g:, 'NERDTreeHighlightCursorline',   1)
